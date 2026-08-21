@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sports Talent AI — Athlete Pro Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <!-- Floating Toast Notification Hub -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Athlete Authentication & Onboarding Modal -->
+  <div class="modal-backdrop" id="athleteAuthModal" style="display: none; z-index: 900;">
+    <div class="auth-sheet">
+      <div class="sheet-drag-handle"></div>
+      <div class="sheet-top-row">
+        <div class="brand-badge-row">
+          <div class="brand-icon-sm"><i class="fa-solid fa-bolt"></i></div>
+          <div>
+            <h3>SPORTS TALENT <span class="text-emerald">PRO</span></h3>
+            <span class="auth-sub">Standardized Smartphone Athlete Testing</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-tabs-row">
+        <button class="m-auth-tab active" id="tabAthLoginBtn" onclick="switchAthleteAuthTab('login')">Athlete Sign In</button>
+        <button class="m-auth-tab" id="tabAthRegBtn" onclick="switchAthleteAuthTab('register')">Create Profile</button>
+      </div>
+
+      <!-- Athlete Login Form -->
+      <form id="athLoginForm" onsubmit="handleAthleteLogin(event)" style="margin-top: 14px;">
+        <div class="field-group">
+          <label>Registered Mobile Number</label>
+          <input type="tel" id="athLoginPhone" required class="field-input" placeholder="e.g. 9876543220" value="9876543220">
+        </div>
+        <div class="field-group">
+          <label>Password</label>
+          <input type="password" id="athLoginPassword" required class="field-input" placeholder="••••••••" value="password123">
+        </div>
+
+        <div class="quick-demo-box" style="margin-bottom: 12px;">
+          <span style="font-size: 9px; color: var(--text-muted); display: block; margin-bottom: 4px;">Quick Demo Athletes:</span>
+          <button type="button" class="demo-chip-sm" onclick="fillAthleteDemo('9876543220', 'password123')">Arjun (15y • Sprinter)</button>
+          <button type="button" class="demo-chip-sm" onclick="fillAthleteDemo('9876543221', 'password123')">Priya (16y • Football)</button>
+        </div>
+
+        <button type="submit" class="btn-primary-action"><i class="fa-solid fa-right-to-bracket"></i> Sign In to Athlete Dashboard</button>
+      </form>
+
+      <!-- Athlete Register Form -->
+      <form id="athRegForm" style="display: none; margin-top: 14px;" onsubmit="handleAthleteRegister(event)">
+        <div class="field-group">
+          <label>Full Athlete / Student Name</label>
+          <input type="text" id="regAthName" required class="field-input" placeholder="e.g. Kavita Singh">
+        </div>
+        <div class="field-row">
+          <div class="field-group" style="flex:1;">
+            <label>Phone Number</label>
+            <input type="tel" id="regAthPhone" required class="field-input" placeholder="9876500005">
+          </div>
+          <div class="field-group" style="flex:1;">
+            <label>Date of Birth</label>
+            <input type="date" id="regAthDob" required class="field-input" value="2011-05-18">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group" style="flex:1;">
+            <label>Gender</label>
+            <select id="regAthGender" class="field-input">
+              <option value="FEMALE">Female</option>
+              <option value="MALE">Male</option>
+            </select>
+          </div>
+          <div class="field-group" style="flex:1;">
+            <label>State</label>
+            <select id="regAthState" class="field-input">
+              <option value="Haryana">Haryana</option>
+              <option value="Telangana">Telangana</option>
+              <option value="Assam">Assam</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Punjab">Punjab</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group" style="flex:1;">
+            <label>District</label>
+            <input type="text" id="regAthDistrict" required class="field-input" placeholder="Rohtak">
+          </div>
+          <div class="field-group" style="flex:1;">
+            <label>Preferred Sport</label>
+            <select id="regAthSport" class="field-input">
+              <option value="ATHLETICS_SPRINT">Athletics (Sprints & Jumps)</option>
+              <option value="FOOTBALL">Football (Soccer)</option>
+              <option value="BASKETBALL">Basketball</option>
+              <option value="GENERAL_FITNESS">General Fitness</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group" style="flex:1;">
+            <label>Height (cm)</label>
+            <input type="number" id="regAthHeight" class="field-input" value="165">
+          </div>
+          <div class="field-group" style="flex:1;">
+            <label>Weight (kg)</label>
+            <input type="number" id="regAthWeight" class="field-input" value="52">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Password</label>
+          <input type="password" id="regAthPassword" required class="field-input" placeholder="••••••••">
+        </div>
+        <div class="consent-check-box">
+          <input type="checkbox" id="regAthConsent" checked required>
+          <label for="regAthConsent">DPDP Act 2023: Verified Parent / Guardian consent for AI athletic screening.</label>
+        </div>
+        <button type="submit" class="btn-primary-action"><i class="fa-solid fa-user-plus"></i> Create Athlete Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Physical Trial Admit Card Dialog -->
+  <div class="modal-backdrop" id="admitPassModal" style="display: none; z-index: 800;">
+    <div class="setup-sheet">
+      <div class="sheet-drag-handle"></div>
+      <div class="sheet-top-row">
+        <h3><i class="fa-solid fa-ticket text-emerald"></i> Official Physical Trial Entry Pass</h3>
+        <button class="btn-sheet-dismiss" onclick="closeAdmitPassModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="admit-pass-card" id="admitPassPrintable">
+        <div class="pass-header">
+          <div class="pass-title">SPORTS AUTHORITY OF INDIA &bull; PHYSICAL TRIAL ADMIT PASS</div>
+          <span class="pass-tag font-mono">SAI-TR-2026-HYD</span>
+        </div>
+        <div class="pass-body">
+          <div class="pass-athlete-name" id="passAthleteName">Arjun Netam</div>
+          <div class="pass-meta-row" id="passAthleteSub">Age: 15 &bull; Male &bull; Telangana &bull; Sprinting</div>
+          
+          <div class="pass-venue-box">
+            <div class="pv-item"><strong>Trial Venue:</strong> <span id="passVenueName">Gachibowli Athletics Stadium, Hyderabad</span></div>
+            <div class="pv-item"><strong>Reporting Date & Time:</strong> <span id="passTrialDate" class="text-emerald font-mono">Sept 15, 2026 &bull; 08:30 AM</span></div>
+            <div class="pv-item"><strong>Field Coordinator:</strong> <span id="passCoord">Coach K. Srinivas (+91-9440123456)</span></div>
+          </div>
+
+          <div class="pass-qr-row">
+            <div class="qr-code-box"><i class="fa-solid fa-qrcode"></i></div>
+            <div class="pass-instructions">
+              <strong>Reporting Instructions:</strong>
+              <div>Carry physical government school ID / Aadhaar card and spike running shoes. Reporting counter #4.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-btn-stack" style="margin-top: 14px;">
+        <button class="btn-launch-camera" onclick="downloadAdmitCardPNG()"><i class="fa-solid fa-download"></i> Download Admit Pass (PNG)</button>
+        <button class="btn-upload-video" onclick="closeAdmitPassModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-frame">
+    
+    <!-- Top Athlete Profile Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="app-avatar" id="athleteAvatar">AN</div>
+        <div>
+          <div class="app-greeting" id="athleteGreeting">Hello, Arjun!</div>
+          <div class="app-sub" id="athleteSub">Adilabad, Telangana &bull; Sprinter</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <select id="langSelect" class="lang-picker" onchange="changeLanguage(this.value)">
+          <option value="en">EN</option>
+          <option value="hi">हिन्दी</option>
+          <option value="te">తెలుగు</option>
+          <option value="ta">தமிழ்</option>
+        </select>
+        <button class="btn-header-icon" onclick="handleAthleteLogout()" title="Log Out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <!-- Scrollable Body Content -->
+    <div class="app-content">
+
+      <!-- View 1: Standardized Tests Feed -->
+      <section id="tabHome" class="tab-view active">
+        
+        <!-- Trial Invitation Banner -->
+        <div class="trial-alert-card" id="trialAlertBox" onclick="openAdmitPassModal()" style="cursor: pointer;">
+          <div class="trial-alert-badge"><i class="fa-solid fa-trophy text-citron"></i> PHYSICAL TRIAL INVITATION ISSUED</div>
+          <h4 id="trialAlertTitle">Telangana State Grassroots Athletics Trial 2026</h4>
+          <div class="trial-venue-info"><i class="fa-solid fa-location-dot text-emerald"></i> <span id="trialAlertVenue">Gachibowli Athletics Stadium, Hyderabad</span></div>
+          <div class="trial-venue-info"><i class="fa-solid fa-calendar-day text-emerald"></i> <span id="trialAlertDate">Sept 15, 2026 • 08:30 AM</span></div>
+          <div class="trial-alert-sub">Shortlisted by SAI Scout Coach Vikram Rathore. Tap here to view and download your official Admit Pass &rarr;</div>
+        </div>
+
+        <!-- Assessment Progress Meter -->
+        <div class="progress-box">
+          <div class="progress-top">
+            <div>
+              <span class="progress-title" id="txtAssessmentProg">Physical Screening Protocol</span>
+              <div class="progress-sub" id="txtCompletedCount">3 of 4 Tests Verified by AI</div>
+            </div>
+            <div class="progress-num">75%</div>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 75%;"></div>
+          </div>
+        </div>
+
+        <!-- Test Selection Cards Grid -->
+        <div class="section-label-row">
+          <span>STANDARDIZED PHYSICAL TESTS</span>
+          <span class="text-citron"><i class="fa-solid fa-camera"></i> AI Verified</span>
+        </div>
+
+        <div class="tests-list">
+          
+          <!-- Test 1: Vertical Jump -->
+          <div class="test-item-card" onclick="openTestSetupModal('VERTICAL_JUMP')">
+            <div class="test-icon-badge icon-jump"><i class="fa-solid fa-arrow-trend-up"></i></div>
+            <div class="test-meta">
+              <div class="test-title">Countermovement Vertical Jump</div>
+              <div class="test-desc">Measures lower-body explosive power, air flight duration & apex height.</div>
+              <div class="test-pills">
+                <span class="pill-req"><i class="fa-solid fa-video"></i> Lateral View (3m)</span>
+                <span class="pill-verified"><i class="fa-solid fa-check"></i> 48.5 cm (94.2%ile)</span>
+              </div>
+            </div>
+            <div class="test-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+          </div>
+
+          <!-- Test 2: Squat Assessment -->
+          <div class="test-item-card" onclick="openTestSetupModal('SQUAT_TEST')">
+            <div class="test-icon-badge icon-squat"><i class="fa-solid fa-person-arrow-down-to-line"></i></div>
+            <div class="test-meta">
+              <div class="test-title">Bodyweight Squat & Symmetry</div>
+              <div class="test-desc">Tracks knee angle depth (θ), continuous reps & bilateral symmetry.</div>
+              <div class="test-pills">
+                <span class="pill-req"><i class="fa-solid fa-video"></i> Full Body Lateral</span>
+                <span class="pill-verified"><i class="fa-solid fa-check"></i> 96.2% Balance (92.5%ile)</span>
+              </div>
+            </div>
+            <div class="test-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+          </div>
+
+          <!-- Test 3: 20m Sprint -->
+          <div class="test-item-card" onclick="openTestSetupModal('SPRINT_20M')">
+            <div class="test-icon-badge icon-sprint"><i class="fa-solid fa-person-running-fast"></i></div>
+            <div class="test-meta">
+              <div class="test-title">20-Meter Sprint Acceleration</div>
+              <div class="test-desc">Measures takeoff reaction burst, cadence & split velocity.</div>
+              <div class="test-pills">
+                <span class="pill-req"><i class="fa-solid fa-flag-checkered"></i> 20m Cones</span>
+                <span class="pill-verified"><i class="fa-solid fa-check"></i> 2.84s (92.0%ile)</span>
+              </div>
+            </div>
+            <div class="test-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+          </div>
+
+          <!-- Test 4: Standing Broad Jump -->
+          <div class="test-item-card" onclick="openTestSetupModal('BROAD_JUMP')">
+            <div class="test-icon-badge icon-broad"><i class="fa-solid fa-arrows-left-right"></i></div>
+            <div class="test-meta">
+              <div class="test-title">Standing Broad Jump</div>
+              <div class="test-desc">Measures horizontal explosive takeoff power & landing balance.</div>
+              <div class="test-pills">
+                <span class="pill-req"><i class="fa-solid fa-tape"></i> Marked Line</span>
+                <span class="pill-start"><i class="fa-solid fa-play"></i> Start Test</span>
+              </div>
+            </div>
+            <div class="test-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- View 2: Verified Athlete Talent Card -->
+      <section id="tabResults" class="tab-view" style="display: none;">
+        <div class="section-label-row">
+          <span>NATIONAL SPORTS TALENT PASSPORT</span>
+          <span class="text-emerald">&check; Cryptographic SHA-256 Validated</span>
+        </div>
+
+        <div class="athlete-passport-card" id="printableCard">
+          <div class="passport-top-ribbon">
+            <div class="passport-badge-title">
+              <i class="fa-solid fa-medal text-citron"></i>
+              <span>NATIONAL SPORTS TALENT DISCOVERY</span>
+            </div>
+            <span class="passport-id-tag">ID: IND-2026-ARJ94</span>
+          </div>
+
+          <div class="passport-profile-row">
+            <div class="passport-avatar-box">AN</div>
+            <div>
+              <h2 class="passport-name" id="cardAthleteName">Arjun Netam</h2>
+              <div class="passport-meta-sub">Age: 15 &bull; Male &bull; Height: 172.5 cm</div>
+              <div class="passport-meta-sub">Adilabad, Telangana &bull; Sprinter</div>
+            </div>
+          </div>
+
+          <!-- Circular Metric Rings / Score Strip -->
+          <div class="passport-stats-row">
+            <div class="stat-circle-box">
+              <div class="stat-ring-val text-emerald font-mono">92.5</div>
+              <div class="stat-ring-lbl">POTENTIAL SCORE</div>
+            </div>
+            <div class="stat-circle-box">
+              <div class="stat-ring-val text-citron font-mono">HIGH</div>
+              <div class="stat-ring-lbl">SCOUT BAND</div>
+            </div>
+            <div class="stat-circle-box">
+              <div class="stat-ring-val text-blue font-mono">89.5%</div>
+              <div class="stat-ring-lbl">AI CONFIDENCE</div>
+            </div>
+          </div>
+
+          <div class="passport-metrics-list">
+            <div class="pm-row">
+              <span>Vertical Jump (Air Flight Model)</span>
+              <strong class="font-mono text-emerald">48.5 cm (94.2%ile)</strong>
+            </div>
+            <div class="pm-row">
+              <span>Takeoff Ground Velocity (v₀)</span>
+              <strong class="font-mono text-blue">3.08 m/s (94.0%ile)</strong>
+            </div>
+            <div class="pm-row">
+              <span>Bilateral Squat Symmetry</span>
+              <strong class="font-mono text-citron">96.2% Balance (92.5%ile)</strong>
+            </div>
+            <div class="pm-row">
+              <span>20m Sprint Acceleration</span>
+              <strong class="font-mono text-emerald">2.84 sec (92.0%ile)</strong>
+            </div>
+          </div>
+
+          <div class="passport-footer-row">
+            <div class="qr-code-box"><i class="fa-solid fa-qrcode"></i></div>
+            <div>
+              <div class="passport-verified-tag">&check; SHORTLISTED FOR PHYSICAL TRIALS</div>
+              <div class="passport-sub-info">Gachibowli Stadium, Hyderabad &bull; Sept 15, 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-save-passport" onclick="downloadCard()"><i class="fa-solid fa-download"></i> Save Verified Talent Passport (PNG)</button>
+      </section>
+
+      <!-- View 3: Community School Operator Mode -->
+      <section id="tabOperator" class="tab-view" style="display: none;">
+        <div class="section-label-row">
+          <span>GOVERNMENT SCHOOL / PANCHAYAT BATCH MODE</span>
+          <span class="text-emerald">Multi-Student Flow</span>
+        </div>
+
+        <div class="operator-info-card">
+          <i class="fa-solid fa-users-viewfinder text-emerald" style="font-size: 26px;"></i>
+          <div>
+            <h4>Shared Device Sequential Screening</h4>
+            <p>Empowers teachers & district coaches to assess students without personal smartphones.</p>
+          </div>
+        </div>
+
+        <div class="operator-form-card">
+          <h4 style="margin-bottom: 14px;"><i class="fa-solid fa-user-plus text-emerald"></i> Student Onboarding & DPDP Consent</h4>
+          <form onsubmit="handleOperatorRegistration(event)">
+            <div class="field-group">
+              <label>Student Full Name</label>
+              <input type="text" id="opName" placeholder="e.g. Ramesh Rathod" required class="field-input">
+            </div>
+            <div class="field-row">
+              <div class="field-group" style="flex:1;">
+                <label>Date of Birth</label>
+                <input type="date" id="opDob" value="2011-06-12" required class="field-input">
+              </div>
+              <div class="field-group" style="flex:1;">
+                <label>Gender</label>
+                <select id="opGender" class="field-input">
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group" style="flex:1;">
+                <label>Height (cm)</label>
+                <input type="number" id="opHeight" value="168" class="field-input">
+              </div>
+              <div class="field-group" style="flex:1;">
+                <label>Weight (kg)</label>
+                <input type="number" id="opWeight" value="55" class="field-input">
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Guardian / School Contact Phone</label>
+              <input type="tel" id="opPhone" placeholder="9876540001" required class="field-input">
+            </div>
+            <div class="consent-check-box">
+              <input type="checkbox" id="opConsent" checked required>
+              <label for="opConsent">DPDP Act 2023: Verified Parent / Headmaster consent for athletic video assessment.</label>
+            </div>
+            <button type="submit" class="btn-primary-action"><i class="fa-solid fa-camera"></i> Register Student & Launch Camera</button>
+          </form>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" id="navHomeBtn" onclick="switchMobileTab('home')">
+        <i class="fa-solid fa-person-running"></i>
+        <span>Assess</span>
+      </button>
+      <button class="nav-btn" id="navResultsBtn" onclick="switchMobileTab('results')">
+        <i class="fa-solid fa-id-card"></i>
+        <span>Talent Card</span>
+      </button>
+      <button class="nav-btn" id="navOperatorBtn" onclick="switchMobileTab('operator')">
+        <i class="fa-solid fa-school"></i>
+        <span>Centre Mode</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Test Setup & Protocol Sheet Modal -->
+  <div class="modal-backdrop" id="setupModal" style="display: none;">
+    <div class="setup-sheet">
+      <div class="sheet-drag-handle"></div>
+      <div class="sheet-top-row">
+        <h3 id="setupTestTitle">Countermovement Vertical Jump</h3>
+        <button class="btn-sheet-dismiss" onclick="closeTestSetupModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="sheet-content">
+        <div class="setup-hero-icon" id="setupIllustration">
+          <i class="fa-solid fa-arrows-up-to-line text-emerald"></i>
+        </div>
+
+        <div class="protocol-box">
+          <div class="protocol-title"><i class="fa-solid fa-triangle-exclamation text-citron"></i> Standard Assessment Protocol:</div>
+          <ul id="setupRulesList">
+            <li>Place smartphone 3 to 4 meters away at hip level in landscape orientation.</li>
+            <li>Stand in full view: ensure head and feet are visible inside the guide frame.</li>
+            <li>Follow the dynamic anti-cheat gesture challenge before initiating movement.</li>
+            <li>Jump vertically with maximum effort and land with soft controlled balance.</li>
+          </ul>
+        </div>
+
+        <div class="setup-btn-stack">
+          <button class="btn-launch-camera" onclick="launchLiveCameraFlow()"><i class="fa-solid fa-camera"></i> Start Live Guided Camera</button>
+          <button class="btn-upload-video" onclick="document.getElementById('fileInput').click()"><i class="fa-solid fa-upload"></i> Upload Video File</button>
+          <input type="file" id="fileInput" accept="video/*" style="display: none;" onchange="handleFileUpload(event)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Live Camera & HUD Viewport -->
+  <div class="camera-viewport-modal" id="cameraModal" style="display: none;">
+    <div class="camera-stage">
+      
+      <!-- Video Element & Tracking Canvas -->
+      <video id="liveVideo" autoplay playsinline muted></video>
+      <canvas id="liveCanvas"></canvas>
+
+      <!-- Top Camera Bar -->
+      <div class="cam-top-bar">
+        <div class="cam-pill"><i class="fa-solid fa-camera text-emerald"></i> <span id="hudTestName">Vertical Jump</span></div>
+        <button class="btn-cam-close" onclick="closeCameraModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Smart Silhouette Bounding Bracket -->
+      <div class="body-guide-bracket" id="bodyGuideBox">
+        <div class="corner-bracket top-l"></div>
+        <div class="corner-bracket top-r"></div>
+        <div class="corner-bracket btm-l"></div>
+        <div class="corner-bracket btm-r"></div>
+        <div class="guide-tag-label" id="guideText">ALIGN FULL BODY HEAD TO FEET</div>
+      </div>
+
+      <!-- Pre-Flight Telemetry HUD -->
+      <div class="cam-quality-hud" id="qualityHud">
+        <div class="q-item"><i class="fa-solid fa-check text-emerald"></i> Framing: Full Body</div>
+        <div class="q-item"><i class="fa-solid fa-check text-emerald"></i> Light: Optimal (142 lx)</div>
+        <div class="q-item"><i class="fa-solid fa-check text-emerald"></i> Scale: ArUco Active</div>
+      </div>
+
+      <!-- Dynamic Anti-Cheat Challenge Banner -->
+      <div class="anti-cheat-card" id="challengeAlertBox">
+        <div class="ac-title"><i class="fa-solid fa-hand text-citron"></i> ANTI-CHEAT DYNAMIC GESTURE CHALLENGE</div>
+        <div class="ac-desc" id="challengeDescText">Raise your left arm high above your head before jumping!</div>
+      </div>
+
+      <!-- 3-2-1 Countdown Overlay -->
+      <div class="countdown-hud-overlay" id="countdownBox" style="display: none;">
+        <div class="countdown-glyph" id="countdownNum">3</div>
+      </div>
+
+      <!-- Live Real-Time Telemetry Readout -->
+      <div class="live-metric-hud" id="realtimeReadout" style="display: none;">
+        <div class="metric-hud-cell">
+          <div class="m-hud-val font-mono" id="rtVal">82°</div>
+          <div class="m-hud-lbl" id="rtLbl">Knee Angle</div>
+        </div>
+        <div class="metric-hud-cell">
+          <div class="m-hud-val text-emerald font-mono" id="rtReps">3</div>
+          <div class="m-hud-lbl">Valid Reps</div>
+        </div>
+      </div>
+
+      <!-- Bottom Shutter Bar -->
+      <div class="cam-bottom-bar">
+        <div class="cam-hint" id="hudInstructionText">Stand 3m away. Align inside the brackets.</div>
+        <button class="tactile-shutter" id="shutterBtn" onclick="triggerCountdownAndRecord()">
+          <div class="shutter-core"></div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

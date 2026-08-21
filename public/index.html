@@ -1,0 +1,620 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sports Talent AI — Scout & Institutional Discovery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <!-- Floating Toast Notification Hub -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scout Authentication & Onboarding Modal -->
+  <div class="auth-overlay" id="scoutAuthModal" style="display: none;">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-brand">
+          <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div>
+            <h3>SPORTS TALENT <span class="brand-tag">SCOUT PRO</span></h3>
+            <p>Official Institutional Talent Scouting Portal &bull; SAI</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabScoutLoginBtn" onclick="switchAuthTab('login')">Official Sign In</button>
+        <button class="auth-tab" id="tabScoutRegisterBtn" onclick="switchAuthTab('register')">Register Official Scout</button>
+      </div>
+
+      <div class="auth-body">
+        <!-- Sign In Form -->
+        <form id="scoutLoginForm" onsubmit="handleScoutLogin(event)">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label>Registered Mobile Phone</label>
+            <input type="tel" id="loginPhone" required class="custom-input" placeholder="e.g. 9876543210" value="9876543210">
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label>Password</label>
+            <input type="password" id="loginPassword" required class="custom-input" placeholder="••••••••" value="password123">
+          </div>
+
+          <div class="quick-demo-pills" style="margin-bottom: 16px;">
+            <span style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 6px;">Quick Demo Profiles:</span>
+            <button type="button" class="demo-chip" onclick="fillScoutDemo('9876543210', 'password123')">Coach Vikram (SAI)</button>
+            <button type="button" class="demo-chip" onclick="fillScoutDemo('9876543212', 'password123')">Admin Priya (Sports Ministry)</button>
+          </div>
+
+          <button type="submit" class="btn-auth-submit"><i class="fa-solid fa-right-to-bracket"></i> Access Scout Command Centre</button>
+        </form>
+
+        <!-- Registration Form -->
+        <form id="scoutRegisterForm" style="display: none;" onsubmit="handleScoutRegister(event)">
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label>Full Official Name</label>
+            <input type="text" id="regScoutName" required class="custom-input" placeholder="e.g. Coach K. Srinivas Rao">
+          </div>
+          <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div class="form-group" style="flex:1;">
+              <label>Phone Number</label>
+              <input type="tel" id="regScoutPhone" required class="custom-input" placeholder="9876500001">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Official Email</label>
+              <input type="email" id="regScoutEmail" class="custom-input" placeholder="srinivas@sai.gov.in">
+            </div>
+          </div>
+          <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div class="form-group" style="flex:1;">
+              <label>Organization / Body</label>
+              <select id="regScoutOrg" class="custom-select">
+                <option value="Sports Authority of India (SAI)">Sports Authority of India (SAI)</option>
+                <option value="Khelo India State Academy">Khelo India State Academy</option>
+                <option value="Athletics Federation of India">Athletics Federation of India</option>
+                <option value="State Sports Authority">State Sports Authority</option>
+                <option value="District Sports Council">District Sports Council</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Employee / Scout Badge ID</label>
+              <input type="text" id="regScoutBadge" required class="custom-input" placeholder="SAI-SCT-9120">
+            </div>
+          </div>
+          <div class="form-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div class="form-group" style="flex:1;">
+              <label>Assigned Region / State</label>
+              <select id="regScoutState" class="custom-select">
+                <option value="Telangana">Telangana</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Assam">Assam</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Maharashtra">Maharashtra</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Specialization</label>
+              <select id="regScoutSpec" class="custom-select">
+                <option value="ATHLETICS_SPRINT">Athletics (Sprints & Jumps)</option>
+                <option value="FOOTBALL">Football</option>
+                <option value="BASKETBALL">Basketball</option>
+                <option value="GENERAL_FITNESS">General Athletic Fitness</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label>Password</label>
+            <input type="password" id="regScoutPassword" required class="custom-input" placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn-auth-submit"><i class="fa-solid fa-id-badge"></i> Create Scout Profile</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Layout -->
+  <div class="app-layout">
+    
+    <!-- Top Navigation Bar -->
+    <header class="app-navbar">
+      <div class="nav-left">
+        <div class="brand-badge">
+          <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="brand-text">
+            <span class="brand-title">SPORTS TALENT <span class="brand-tag">SCOUT PRO</span></span>
+            <span class="brand-sub">Grassroots Talent Screening Infrastructure &bull; SAI / Khelo India</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-center">
+        <button class="nav-pill active" id="tabDiscoveryBtn" onclick="switchTab('discovery')">
+          <i class="fa-solid fa-magnifying-glass-chart"></i> Athlete Discovery
+        </button>
+        <button class="nav-pill" id="tabCompareBtn" onclick="switchTab('compare')">
+          <i class="fa-solid fa-code-compare"></i> Head-to-Head Compare
+        </button>
+        <button class="nav-pill" id="tabTrialsBtn" onclick="switchTab('trials')">
+          <i class="fa-solid fa-calendar-check"></i> Physical Trials
+        </button>
+        <button class="nav-pill" id="tabBiasBtn" onclick="switchTab('bias')">
+          <i class="fa-solid fa-chart-pie"></i> Fairness & Telemetry
+        </button>
+      </nav>
+
+      <div class="nav-right">
+        <div class="scout-chip">
+          <div class="scout-avatar" id="navScoutAvatar">VR</div>
+          <div>
+            <div class="scout-name" id="navScoutName">Coach Vikram Rathore</div>
+            <div class="scout-role"><span class="role-badge" id="navScoutRole">SAI DISTRICT SCOUT</span></div>
+          </div>
+          <button class="btn-logout" onclick="handleScoutLogout()" title="Log Out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <main class="main-body">
+
+      <!-- View 1: Athlete Discovery -->
+      <section id="viewDiscovery" class="view-section active">
+        
+        <!-- Key Metrics Strip -->
+        <div class="metric-strip">
+          <div class="metric-item">
+            <span class="metric-lbl">Total Assessed</span>
+            <div class="metric-val" id="kpiTotalAssessed">12,480 <span class="metric-trend"><i class="fa-solid fa-arrow-trend-up"></i> +14%</span></div>
+            <span class="metric-sub">143 Districts (68% Rural)</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-lbl">AI Verified Tests</span>
+            <div class="metric-val" id="kpiVerifiedTests">34,915</div>
+            <span class="metric-sub">94.2% Video Integrity Pass</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-lbl">High-Potential Shortlisted</span>
+            <div class="metric-val val-emerald" id="kpiShortlisted">1,286</div>
+            <span class="metric-sub">Top Cohort Rank &ge; 80%</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-lbl">Physical Trials Scheduled</span>
+            <div class="metric-val val-citron" id="kpiTrialsCount">214</div>
+            <span class="metric-sub">Human Scout Triage Confirmed</span>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="toolbar-card">
+          <div class="filter-row">
+            
+            <div class="search-input-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="filterSearch" placeholder="Search athlete name, district, school..." oninput="applyFilters()">
+            </div>
+
+            <div class="filter-dropdown">
+              <label>Discipline</label>
+              <select id="filterSport" onchange="applyFilters()">
+                <option value="">All Sports</option>
+                <option value="ATHLETICS_SPRINT" selected>Athletics (Sprints & Jumps)</option>
+                <option value="FOOTBALL">Football (Soccer)</option>
+                <option value="BASKETBALL">Basketball</option>
+                <option value="GENERAL_FITNESS">General Fitness</option>
+              </select>
+            </div>
+
+            <div class="filter-dropdown">
+              <label>State / Region</label>
+              <select id="filterState" onchange="applyFilters()">
+                <option value="">National (All States)</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Assam">Assam</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Maharashtra">Maharashtra</option>
+              </select>
+            </div>
+
+            <div class="filter-slider-box">
+              <div class="slider-header">
+                <label>Min Percentile</label>
+                <span id="scoreLabel" class="slider-val-badge">80th+ %ile</span>
+              </div>
+              <input type="range" id="filterMinScore" min="50" max="95" value="80" oninput="updateScoreLabel(this.value); applyFilters();">
+            </div>
+
+            <div class="filter-dropdown">
+              <label>Review Status</label>
+              <select id="filterStatus" onchange="applyFilters()">
+                <option value="">All Statuses</option>
+                <option value="PENDING_REVIEW" selected>Pending Review</option>
+                <option value="APPROVED_FOR_TRIAL">Approved for Trial</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Secondary Toolbar: Results Count & View Toggle -->
+          <div class="toolbar-footer">
+            <div class="results-count">
+              Showing <strong id="candidateCount">0</strong> High-Potential Candidates
+              <span class="xai-chip"><i class="fa-solid fa-shield-halved"></i> AI screens evidence &bull; Scouts decide invitations</span>
+            </div>
+
+            <div class="toolbar-actions">
+              <div class="view-toggle">
+                <button class="toggle-btn active" id="btnViewCards" onclick="setViewMode('cards')"><i class="fa-solid fa-grip"></i> Cards</button>
+                <button class="toggle-btn" id="btnViewTable" onclick="setViewMode('table')"><i class="fa-solid fa-table-list"></i> Table</button>
+              </div>
+              <button class="btn-action" onclick="exportRosterCSV()"><i class="fa-solid fa-file-arrow-down"></i> Export CSV</button>
+              <button class="btn-action" onclick="fetchAthletes()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Candidate Display (Cards Grid or Table) -->
+        <div id="athletesCardGrid" class="athletes-card-grid">
+          <!-- Populated by app.js -->
+        </div>
+
+        <div id="athletesTableWrapper" class="table-wrapper" style="display: none;">
+          <table class="pro-table">
+            <thead>
+              <tr>
+                <th>Athlete</th>
+                <th>Location</th>
+                <th>Age / Gender</th>
+                <th>Discipline</th>
+                <th>Top Metric (Kinematics)</th>
+                <th>Cohort %ile</th>
+                <th>AI Confidence</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="athletesTableBody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- View 2: Candidate Head-to-Head Comparison -->
+      <section id="viewCompare" class="view-section" style="display: none;">
+        <div class="section-title-bar">
+          <div>
+            <h2><i class="fa-solid fa-code-compare"></i> Biomechanical Head-to-Head Comparison</h2>
+            <p>Evaluate explosive power, cadence, and bilateral symmetry metrics between two shortlisted athletes.</p>
+          </div>
+        </div>
+
+        <div class="compare-picker-card">
+          <div class="compare-sel-unit">
+            <label>Candidate 1 (Primary):</label>
+            <select id="compSelect1" class="custom-select" onchange="renderComparison()"></select>
+          </div>
+          <div class="compare-vs-ring">VS</div>
+          <div class="compare-sel-unit">
+            <label>Candidate 2 (Benchmark):</label>
+            <select id="compSelect2" class="custom-select" onchange="renderComparison()"></select>
+          </div>
+        </div>
+
+        <div class="compare-workspace" id="compareGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- View 3: Physical Trials Management -->
+      <section id="viewTrials" class="view-section" style="display: none;">
+        <div class="section-title-bar">
+          <div>
+            <h2><i class="fa-solid fa-calendar-check"></i> Scheduled District Physical Verification Trials</h2>
+            <p>Institutional verification venues coordinated across Sports Authority of India & State Federations.</p>
+          </div>
+          <button class="btn-emerald" onclick="openNewTrialModal()"><i class="fa-solid fa-plus"></i> Schedule New Trial</button>
+        </div>
+
+        <div class="trials-grid" id="trialsGrid">
+          <!-- Populated by API -->
+        </div>
+      </section>
+
+      <!-- View 4: Regional & Fairness Telemetry -->
+      <section id="viewBias" class="view-section" style="display: none;">
+        <div class="section-title-bar">
+          <div>
+            <h2><i class="fa-solid fa-chart-pie"></i> Ethical AI Model Auditing & Demographic Parity</h2>
+            <p>Real-time telemetry ensuring non-biased scoring across genders, rural access, and smartphone hardware.</p>
+          </div>
+          <span class="telemetry-live-pill"><i class="fa-solid fa-circle-dot"></i> Live Model Telemetry</span>
+        </div>
+
+        <div class="telemetry-deck">
+          <div class="telemetry-widget">
+            <h3><i class="fa-solid fa-venus-mars"></i> Gender Representation</h3>
+            <div class="progress-pair">
+              <div class="pair-row"><span>Male Candidates (54%)</span><strong>6,739</strong></div>
+              <div class="custom-bar-track"><div class="custom-bar-fill fill-blue" style="width: 54%;"></div></div>
+            </div>
+            <div class="progress-pair" style="margin-top: 12px;">
+              <div class="pair-row"><span>Female Candidates (46%)</span><strong>5,741</strong></div>
+              <div class="custom-bar-track"><div class="custom-bar-fill fill-pink" style="width: 46%;"></div></div>
+            </div>
+            <div class="widget-note">Gender equity ratio verified within SAI grassroots diversity targets.</div>
+          </div>
+
+          <div class="telemetry-widget">
+            <h3><i class="fa-solid fa-tree-city"></i> Rural vs Urban Distribution</h3>
+            <div class="progress-pair">
+              <div class="pair-row"><span>Rural / Tribal Districts (68%)</span><strong>8,486</strong></div>
+              <div class="custom-bar-track"><div class="custom-bar-fill fill-emerald" style="width: 68%;"></div></div>
+            </div>
+            <div class="progress-pair" style="margin-top: 12px;">
+              <div class="pair-row"><span>Urban Centers (32%)</span><strong>3,994</strong></div>
+              <div class="custom-bar-track"><div class="custom-bar-fill fill-purple" style="width: 32%;"></div></div>
+            </div>
+            <div class="widget-note">Community Centre Mode enabled 4,120 smartphone-less students to participate.</div>
+          </div>
+
+          <div class="telemetry-widget">
+            <h3><i class="fa-solid fa-mobile-screen-button"></i> Camera Hardware Invariance</h3>
+            <div class="progress-pair">
+              <div class="pair-row"><span>Budget Devices (&lt; ₹12k) &bull; 88.4% Confidence</span><strong>64%</strong></div>
+              <div class="custom-bar-track"><div class="custom-bar-fill fill-citron" style="width: 88%;"></div></div>
+            </div>
+            <div class="progress-pair" style="margin-top: 12px;">
+              <div class="pair-row"><span>Mid/High Tier &bull; 91.2% Confidence</span><strong>36%</strong></div>
+              <div class="custom-bar-track"><div class="custom-bar-fill fill-citron" style="width: 91%;"></div></div>
+            </div>
+            <div class="widget-note">One-Euro adaptive temporal filter eliminates camera jitter across frame rates.</div>
+          </div>
+        </div>
+
+        <div class="pro-card" style="margin-top: 24px;">
+          <h3 style="margin-bottom: 16px;"><i class="fa-solid fa-map-location-dot"></i> State & District Screening Breakdown</h3>
+          <div class="table-wrapper">
+            <table class="pro-table">
+              <thead>
+                <tr>
+                  <th>State / UT</th>
+                  <th>Key Districts Covered</th>
+                  <th>Athletes Screened</th>
+                  <th>AI Shortlisted</th>
+                  <th>Trial Conversion Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Telangana</strong></td>
+                  <td>Adilabad, Nizamabad, Warangal, Khammam</td>
+                  <td>2,410</td>
+                  <td><strong class="text-emerald">248</strong></td>
+                  <td><span class="badge-tag">18.4%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Haryana</strong></td>
+                  <td>Rohtak, Bhiwani, Sonipat, Jhajjar</td>
+                  <td>2,180</td>
+                  <td><strong class="text-emerald">264</strong></td>
+                  <td><span class="badge-tag">21.2%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Assam</strong></td>
+                  <td>Karbi Anglong, Dima Hasao, Kokrajhar</td>
+                  <td>1,640</td>
+                  <td><strong class="text-emerald">142</strong></td>
+                  <td><span class="badge-tag">16.8%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Kerala</strong></td>
+                  <td>Wayanad, Idukki, Palakkad, Kozhikode</td>
+                  <td>1,890</td>
+                  <td><strong class="text-emerald">196</strong></td>
+                  <td><span class="badge-tag">19.5%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Punjab</strong></td>
+                  <td>Patiala, Sangrur, Bathinda, Ludhiana</td>
+                  <td>1,720</td>
+                  <td><strong class="text-emerald">182</strong></td>
+                  <td><span class="badge-tag">17.6%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Persistent Slide-Over Evidence Inspector Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop" style="display: none;" onclick="closeDossierDrawer()"></div>
+  <aside class="slide-over-drawer" id="dossierDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <div class="athlete-avatar-lg" id="drawerAvatar">AN</div>
+        <div>
+          <h2 id="drawerAthleteName">Arjun Netam</h2>
+          <div class="drawer-sub" id="drawerAthleteSub">15 yrs &bull; Male &bull; Adilabad, Telangana &bull; Sprinter</div>
+        </div>
+      </div>
+      <button class="btn-drawer-close" onclick="closeDossierDrawer()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="drawer-body">
+      
+      <!-- Video & Synchronized Skeleton Wireframe Viewport -->
+      <div class="drawer-video-card">
+        <div class="video-top-tag">
+          <span><i class="fa-solid fa-video"></i> Synchronized Pose Landmark Kinematics</span>
+          <span class="tag-live-wireframe">33 KEYPOINTS TRACKED</span>
+        </div>
+
+        <div class="canvas-box">
+          <canvas id="skeletonCanvas" width="600" height="340"></canvas>
+          <div class="canvas-hud-strip" id="canvasHud">
+            <div><strong>State:</strong> <span id="hudState" class="text-citron">APEX DISPLACEMENT</span></div>
+            <div><strong>Flight Time (&Delta;t):</strong> <span id="hudFlight" class="font-mono">0.628 s</span></div>
+            <div><strong>Takeoff Velocity:</strong> <span id="hudVelocity" class="font-mono">3.08 m/s</span></div>
+            <div><span class="text-emerald font-bold">&check; GESTURE CHALLENGE VERIFIED</span></div>
+          </div>
+        </div>
+
+        <div class="video-scrub-bar">
+          <button class="btn-ctrl" onclick="togglePlayback()"><i class="fa-solid fa-pause" id="playIcon"></i></button>
+          <button class="btn-ctrl" onclick="toggleSkeleton()"><i class="fa-solid fa-bone"></i> Wireframe</button>
+          <span class="video-meta-tag">30.0 FPS &bull; 1280x720 &bull; SHA-256 Validated</span>
+        </div>
+      </div>
+
+      <!-- Score & Potential Summary Ribbon -->
+      <div class="drawer-score-grid">
+        <div class="score-cell">
+          <div class="score-val" id="drawerScore">92.5</div>
+          <div class="score-lbl">POTENTIAL SCORE</div>
+        </div>
+        <div class="score-cell">
+          <div class="score-val text-citron" id="drawerBand">HIGH</div>
+          <div class="score-lbl">INDICATOR BAND</div>
+        </div>
+        <div class="score-cell">
+          <div class="score-val text-emerald" id="drawerConfidence">89.5%</div>
+          <div class="score-lbl">AI CONFIDENCE</div>
+        </div>
+      </div>
+
+      <!-- 5-Axis Biomechanical Radar Profile -->
+      <div class="drawer-section">
+        <h3 class="section-heading"><i class="fa-solid fa-chart-simple"></i> Biomechanical 5-Axis Performance Radar</h3>
+        <div class="radar-chart-card">
+          <canvas id="biomechanicalRadar" width="280" height="240"></canvas>
+          <div class="radar-legend">
+            <div class="leg-item"><span class="leg-dot fill-emerald"></span> Candidate Profile</div>
+            <div class="leg-item"><span class="leg-dot fill-muted"></span> National Cohort Mean (50th %ile)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extracted Biomechanical Metrics List -->
+      <div class="drawer-section">
+        <h3 class="section-heading"><i class="fa-solid fa-gauge-high"></i> Extracted Physical Metrics</h3>
+        <div class="metrics-stack" id="drawerMetricsList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Explainable AI Rationale -->
+      <div class="drawer-section">
+        <h3 class="section-heading"><i class="fa-solid fa-brain"></i> Explainable AI Rationale</h3>
+        <div class="xai-box">
+          <div class="xai-group">
+            <div class="xai-group-title text-emerald"><i class="fa-solid fa-circle-check"></i> Strong Verified Indicators:</div>
+            <ul id="drawerStrongList" class="xai-list"></ul>
+          </div>
+          <div class="xai-group" style="margin-top: 12px;">
+            <div class="xai-group-title text-citron"><i class="fa-solid fa-triangle-exclamation"></i> Recommended Physical Trial Check:</div>
+            <ul id="drawerVerificationList" class="xai-list"></ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Persistent Bottom Action Bar -->
+    <div class="drawer-footer">
+      <button class="btn-triage-approve" onclick="approveForTrial()"><i class="fa-solid fa-paper-plane"></i> Approve for Physical Trial</button>
+      <button class="btn-triage-retest" onclick="requestRetest()"><i class="fa-solid fa-rotate-left"></i> Re-Test</button>
+      <button class="btn-triage-archive" onclick="rejectCandidate()"><i class="fa-solid fa-box-archive"></i></button>
+    </div>
+  </aside>
+
+  <!-- Dispatch Trial Invitation Modal -->
+  <div class="modal-overlay" id="inviteModal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-dialog-header">
+        <h3><i class="fa-solid fa-paper-plane text-emerald"></i> Dispatch Physical Trial Invitation</h3>
+        <button class="btn-modal-close" onclick="closeInviteModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-dialog-body">
+        <p class="modal-instruction">Select the official verification trial venue to issue an official invitation for this candidate:</p>
+        
+        <div class="form-group" style="margin: 16px 0;">
+          <label>Select Trial Venue & Date</label>
+          <select id="inviteTrialSelect" class="custom-select"></select>
+        </div>
+
+        <div class="form-group">
+          <label>Official Scout Notes (Appended to Athlete Record)</label>
+          <textarea id="inviteNotes" class="custom-textarea" placeholder="e.g., Exceptional takeoff velocity and lower-body air flight time. Candidate fast-tracked for 100m sprint and jump assessments."></textarea>
+        </div>
+
+        <div class="modal-dialog-actions">
+          <button class="btn-ghost" onclick="closeInviteModal()">Cancel</button>
+          <button class="btn-emerald" onclick="confirmTrialInvitation()"><i class="fa-solid fa-check"></i> Send Official Invitation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule New Physical Trial Modal -->
+  <div class="modal-overlay" id="newTrialModal" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-dialog-header">
+        <h3><i class="fa-solid fa-calendar-plus text-emerald"></i> Schedule New District Physical Trial</h3>
+        <button class="btn-modal-close" onclick="closeNewTrialModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-dialog-body">
+        <form onsubmit="handleCreateTrial(event)">
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label>Trial Title / Program Name</label>
+            <input type="text" id="trialTitle" required class="custom-input" placeholder="e.g. Telangana Grassroots Sprint Trials 2026">
+          </div>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label>Venue Name & Address</label>
+            <input type="text" id="trialVenue" required class="custom-input" placeholder="e.g. Gachibowli Athletics Stadium, Hyderabad">
+          </div>
+          <div class="form-row" style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div class="form-group" style="flex:1;">
+              <label>District</label>
+              <input type="text" id="trialDistrict" required class="custom-input" placeholder="Hyderabad">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>State</label>
+              <input type="text" id="trialState" required class="custom-input" placeholder="Telangana">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label>Trial Date</label>
+            <input type="date" id="trialDate" required class="custom-input" value="2026-10-15">
+          </div>
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label>Lead Coordinator Contact</label>
+            <input type="text" id="trialCoord" required class="custom-input" placeholder="Coach K. Srinivas (+91-9440123456)">
+          </div>
+          <div class="modal-dialog-actions">
+            <button type="button" class="btn-ghost" onclick="closeNewTrialModal()">Cancel</button>
+            <button type="submit" class="btn-emerald"><i class="fa-solid fa-plus"></i> Create & Publish Trial</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

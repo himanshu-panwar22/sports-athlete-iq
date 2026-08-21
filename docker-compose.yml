@@ -1,0 +1,99 @@
+﻿version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sports_talent_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-sports_talent_db}
+      POSTGRES_USER: ${DB_USER:-sih_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sih_secure_password_2026}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./database/seed_benchmarks.sql:/docker-entrypoint-initdb.d/02_benchmarks.sql
+      - ./database/seed_demo_athletes.sql:/docker-entrypoint-initdb.d/03_demo_athletes.sql
+
+  redis:
+    image: redis:7-alpine
+    container_name: sports_talent_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    container_name: sports_talent_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minio_admin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minio_secure_password_2026}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: sports_talent_backend
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgresql://${DB_USER:-sih_admin}:${DB_PASSWORD:-sih_secure_password_2026}@postgres:5432/${DB_NAME:-sports_talent_db}
+      REDIS_URL: redis://redis:6379
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minio_admin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minio_secure_password_2026}
+      S3_BUCKET: sports-talent-videos
+      JWT_SECRET: ${JWT_SECRET:-dev_secret_key_sih_2026}
+      AI_SERVICE_URL: http://ai-service:8000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+      - redis
+      - minio
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: sports_talent_ai
+    restart: unless-stopped
+    environment:
+      REDIS_URL: redis://redis:6379
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minio_admin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minio_secure_password_2026}
+      S3_BUCKET: sports-talent-videos
+      BACKEND_WEBHOOK_URL: http://backend:4000/api/v1/assessments/webhook/ai-completed
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - minio
+      - postgres
+
+  scout-dashboard:
+    build:
+      context: ./scout-dashboard
+      dockerfile: Dockerfile
+    container_name: sports_talent_dashboard
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  miniodata:

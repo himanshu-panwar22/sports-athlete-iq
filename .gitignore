@@ -1,0 +1,40 @@
+﻿# Node.js dependencies
+node_modules/
+*/node_modules/
+package-lock.json
+.package-lock.json
+
+# Python
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+venv/
+.venv/
+env/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Archive files & temporary scripts
+*.zip
+*.tar.gz
+*.mp4
+pack_temp.ps1
+
+# Uploads storage (keep folder structure)
+uploads/raw/*
+uploads/overlay/*
+!uploads/raw/.gitkeep
+!uploads/overlay/.gitkeep
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
