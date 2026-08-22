@@ -1,13 +1,9 @@
-﻿# Node.js dependencies
+# Node.js dependencies
 node_modules/
-*/node_modules/
-package-lock.json
 .package-lock.json
 
 # Python
 __pycache__/
-*/__pycache__/
-*/*/__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -27,7 +23,7 @@ env/
 *.mp4
 pack_temp.ps1
 
-# Uploads storage (keep folder structure)
+# Uploads storage
 uploads/raw/*
 uploads/overlay/*
 !uploads/raw/.gitkeep
